@@ -18,6 +18,7 @@ See Indian investments with more context. MarketLens Studio combines source-link
 • Explore NSE 52-week highs and lows, search companies and build a watchlist.
 • Inspect price and volume charts, financial filings, ownership disclosures and company announcements.
 • Compare recognized mutual-fund holdings by ISIN, inspect overlap and look through entered fund values to underlying companies.
+• Rank stocks by covered holding schemes with small-cap, mid-cap, large-cap, flexi-cap and overall fund filters. Inspect sources and matched-month changes, follow stocks and export your view.
 • Save custom research filters, review allocation drift and explore clearly labelled scenarios.
 • Follow NSE IPO dates and original issue documents. Keep a manual account-by-account application, blocked-capital, allotment and sale journal.
 • Read separately labelled unofficial GMP publisher reports and snapshots observed by the app.
