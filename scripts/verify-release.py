@@ -1,7 +1,7 @@
 """Check produced APK/AAB metadata, native alignment and signatures without reading signing secrets."""
 from pathlib import Path
 from zipfile import ZipFile
-import struct,subprocess,json,sys,os
+import struct,subprocess,json,sys,os,shutil
 root=Path(__file__).resolve().parents[1]
 sdk=Path(os.environ.get('ANDROID_HOME','/workspace/android/toolchain/sdk'))
 build_tools=sdk/'build-tools/35.0.0'
@@ -32,7 +32,8 @@ for rel in ['app/build/outputs/apk/release/app-release.apk','app/build/outputs/b
   assert "package: name='app.marketlens.studio'" in metadata and "targetSdkVersion:'36'" in metadata
   assert "versionName='1.0.0'" in metadata and "versionCode='1'" in metadata
  else:
-  output=subprocess.check_output(['jarsigner','-verify',str(p)],text=True,stderr=subprocess.STDOUT)
+  signer=shutil.which('jarsigner') or '/workspace/android/toolchain/jdk17/bin/jarsigner'
+  output=subprocess.check_output([signer,'-verify',str(p)],text=True,stderr=subprocess.STDOUT)
   assert 'jar verified' in output,output
   metadata='Signed Android App Bundle; native ELF segments verified. APK built from the same release variant targets API 36.'
  report.append({'artifact':p.name,'bytes':p.stat().st_size,'native_libraries':libs,'metadata':metadata if p.suffix=='.aab' else metadata.splitlines()[:6]})
