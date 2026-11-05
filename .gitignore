@@ -21,3 +21,5 @@ signing.properties
 !/research/v2/history-year-complete.json
 !/research/v2/hdfc-sample.xlsx
 !/research/v2/README.md
+
+.kotlin/
