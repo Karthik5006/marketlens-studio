@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.*
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
@@ -31,7 +32,7 @@ import org.json.JSONObject
 
 class MainActivity:ComponentActivity(){
  private var showAlerts by mutableStateOf(false)
- override fun onCreate(state:Bundle?){super.onCreate(state);enableEdgeToEdge();showAlerts=intent.getBooleanExtra("openAlerts",false);setContent{LensTheme{LensApp(showAlerts,onAlertsHandled={showAlerts=false})}}}
+ override fun onCreate(state:Bundle?){super.onCreate(state);enableEdgeToEdge(statusBarStyle=SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),navigationBarStyle=SystemBarStyle.dark(android.graphics.Color.TRANSPARENT));showAlerts=intent.getBooleanExtra("openAlerts",false);setContent{LensTheme{LensApp(showAlerts,onAlertsHandled={showAlerts=false})}}}
  override fun onNewIntent(intent:Intent){super.onNewIntent(intent);showAlerts=intent.getBooleanExtra("openAlerts",false)}
 }
 internal class UiActions(val form:(FormSpec)->Unit,val stock:(String)->Unit,val ipo:(Research.Ipo)->Unit,val url:(String)->Unit,val route:(String)->Unit,val importFile:(String)->Unit,val export:(String,String,String)->Unit,val permission:()->Unit)
@@ -54,7 +55,7 @@ internal class UiActions(val form:(FormSpec)->Unit,val stock:(String)->Unit,val 
  BackHandler(stock!=null||issue!=null||extra.isNotEmpty()){stock=null;issue=null;extra=""}
  Scaffold(containerColor=Night,snackbarHost={SnackbarHost(snack)},topBar={
   Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal=20.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically){
-   if(stock!=null||issue!=null||extra.isNotEmpty())IconButton({stock=null;issue=null;extra=""}){Icon(Icons.Rounded.ArrowBack,null,tint=Ink)}else Box(Modifier.size(32.dp).background(Lime,RoundedCornerShape(10.dp)),contentAlignment=Alignment.Center){Icon(Icons.Rounded.Insights,null,tint=Night,modifier=Modifier.size(22.dp))}
+   if(stock!=null||issue!=null||extra.isNotEmpty())IconButton({stock=null;issue=null;extra=""}){Icon(Icons.Rounded.ArrowBack,"Back",tint=Ink)}else Box(Modifier.size(32.dp).background(Lime,RoundedCornerShape(10.dp)),contentAlignment=Alignment.Center){Icon(Icons.Rounded.Insights,null,tint=Night,modifier=Modifier.size(22.dp))}
    Spacer(Modifier.width(10.dp));Text("market",fontSize=23.sp,color=Ink,fontWeight=FontWeight.Bold);Text("lens",fontSize=23.sp,color=Lime,fontWeight=FontWeight.Light);Text(" STUDIO",fontSize=8.sp,color=Violet,fontWeight=FontWeight.Bold);Spacer(Modifier.weight(1f))
    IconButton({extra="Alerts";stock=null;issue=null},Modifier.size(42.dp)){BadgedBox(badge={if(s.alerts.any{!it.delivered})Badge(containerColor=Violet)}){Icon(Icons.Rounded.NotificationsNone,"Alerts",tint=Ink)}}
    IconButton({extra="Settings";stock=null;issue=null},Modifier.size(42.dp)){Icon(Icons.Rounded.Tune,"Settings",tint=Ink)}
@@ -83,6 +84,6 @@ internal class UiActions(val form:(FormSpec)->Unit,val stock:(String)->Unit,val 
   }
  }
  if(editor!=null)EditorSheet(editor!!){editor=null}
- if(search&&s.ready)ModalBottomSheet(onDismissRequest={search=false},containerColor=Panel){var query by remember{mutableStateOf("")};Column(Modifier.fillMaxWidth().fillMaxHeight(.85f).padding(horizontal=20.dp)){Text("Find your next idea",color=Ink,fontSize=26.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(15.dp));OutlinedTextField(query,{query=it},label={Text("Company or NSE symbol")},modifier=Modifier.fillMaxWidth(),singleLine=true,leadingIcon={Icon(Icons.Rounded.Search,null)},shape=RoundedCornerShape(16.dp));Spacer(Modifier.height(12.dp));val stocks=remember(query){vm.repo.legacy.stocks.values.filter{(it.name+it.symbol).contains(query,true)}.take(60)};LazyColumn{items(stocks,key={it.symbol}){item->ListItem(headlineContent={Text(item.symbol)},supportingContent={Text(item.name,maxLines=2)},trailingContent={Icon(Icons.Rounded.NorthEast,null,tint=Lime)},colors=ListItemDefaults.colors(containerColor=Panel),modifier=Modifier.clickable{search=false;actions.stock(item.symbol)})}}}}
+ if(search&&s.ready)ModalBottomSheet(sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true),onDismissRequest={search=false},containerColor=Panel){var query by remember{mutableStateOf("")};Column(Modifier.fillMaxWidth().fillMaxHeight(.85f).padding(horizontal=20.dp)){Text("Find your next idea",color=Ink,fontSize=26.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(15.dp));OutlinedTextField(query,{query=it},label={Text("Company or NSE symbol")},modifier=Modifier.fillMaxWidth(),singleLine=true,leadingIcon={Icon(Icons.Rounded.Search,null)},shape=RoundedCornerShape(16.dp));Spacer(Modifier.height(12.dp));val stocks=remember(query){vm.repo.legacy.stocks.values.filter{(it.name+it.symbol).contains(query,true)}.take(60)};LazyColumn{items(stocks,key={it.symbol}){item->ListItem(headlineContent={Text(item.symbol)},supportingContent={Text(item.name,maxLines=2)},trailingContent={Icon(Icons.Rounded.NorthEast,null,tint=Lime)},colors=ListItemDefaults.colors(containerColor=Panel),modifier=Modifier.clickable{search=false;actions.stock(item.symbol)})}}}}
 }
 internal fun safeUrl(raw:String):Boolean=runCatching{val uri=Uri.parse(raw);uri.scheme=="https"&&!uri.host.isNullOrBlank()&&uri.userInfo==null}.getOrDefault(false)

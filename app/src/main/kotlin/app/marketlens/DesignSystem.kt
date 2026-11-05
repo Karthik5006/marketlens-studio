@@ -4,7 +4,7 @@ package app.marketlens
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -64,7 +64,7 @@ internal fun dateText(value:String)=value.ifBlank{"Not published"}
  val maxP=(if(candles)bars.maxOf{if(it.high.isFinite())it.high else it.close}else bars.maxOf{it.close})*1.005
  val denom=max(maxP-minP,.01);val focus=bars.getOrNull(selected)
  Column(modifier){Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Caption(focus?.let{"${it.date} · ${rupees(it.close)}"}?:"${bars.first().date} → ${bars.last().date}",if(focus!=null)Ink else Muted);Caption(if(focus!=null)"Vol ${number(focus.volume,0)}"else "Drag to inspect")}
- Canvas(Modifier.fillMaxWidth().height(210.dp).padding(top=14.dp).semantics{contentDescription="Exchange price chart, ${bars.size} sessions, ${bars.first().date} to ${bars.last().date}. Last close ${bars.last().close}. Raw prices."}.pointerInput(bars){detectDragGestures(onDragEnd={selected=-1},onDragCancel={selected=-1}){change,_->change.consume();selected=((change.position.x/size.width)*(bars.size-1)).roundToInt().coerceIn(0,bars.lastIndex)}}.pointerInput(bars){detectTapGestures(onPress={point->selected=((point.x/size.width)*(bars.size-1)).roundToInt().coerceIn(0,bars.lastIndex);tryAwaitRelease();selected=-1})}){
+ Canvas(Modifier.fillMaxWidth().height(210.dp).padding(top=14.dp).semantics{contentDescription="Exchange price chart, ${bars.size} sessions, ${bars.first().date} to ${bars.last().date}. Last close ${bars.last().close}. Raw prices."}.pointerInput(bars){detectHorizontalDragGestures(onDragEnd={selected=-1},onDragCancel={selected=-1}){change,_->change.consume();selected=((change.position.x/size.width)*(bars.size-1)).roundToInt().coerceIn(0,bars.lastIndex)}}.pointerInput(bars){detectTapGestures(onPress={point->selected=((point.x/size.width)*(bars.size-1)).roundToInt().coerceIn(0,bars.lastIndex);tryAwaitRelease();selected=-1})}){
   val h=size.height*.78f
   fun x(i:Int)=i.toFloat()/bars.lastIndex*size.width
   fun y(p:Double)=h-((p-minP)/denom*h).toFloat()
@@ -83,7 +83,7 @@ internal fun dateText(value:String)=value.ifBlank{"Not published"}
 internal data class FormField(val key:String,val label:String,val initial:String="",val options:List<String> =emptyList(),val number:Boolean=false,val helper:String="",val multiline:Boolean=false)
 internal data class FormSpec(val title:String,val subtitle:String="",val fields:List<FormField>,val saveLabel:String="Save",val onSave:suspend (Map<String,String>)->Unit)
 @Composable internal fun EditorSheet(spec:FormSpec,onDismiss:()->Unit){val values=remember(spec){spec.fields.associate{it.key to mutableStateOf(it.initial)}};var error by remember(spec){mutableStateOf("")};var busy by remember(spec){mutableStateOf(false)};val scope=rememberCoroutineScope()
- ModalBottomSheet(onDismissRequest={if(!busy)onDismiss()},containerColor=Panel,dragHandle={BottomSheetDefaults.DragHandle(color=Muted)},modifier=Modifier.fillMaxHeight(.94f)){
+ ModalBottomSheet(sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true),onDismissRequest={if(!busy)onDismiss()},containerColor=Panel,dragHandle={BottomSheetDefaults.DragHandle(color=Muted)},modifier=Modifier.fillMaxHeight(.94f)){
   Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal=22.dp).padding(bottom=28.dp),verticalArrangement=Arrangement.spacedBy(15.dp)){
    Text(spec.title,color=Ink,fontSize=27.sp,fontWeight=FontWeight.SemiBold);if(spec.subtitle.isNotBlank())Caption(spec.subtitle)
    spec.fields.forEach{f->if(f.options.isNotEmpty()){Text(f.label,color=Muted,fontSize=12.sp);ChoiceRow(f.options,values.getValue(f.key).value){values.getValue(f.key).value=it}}else OutlinedTextField(values.getValue(f.key).value,{values.getValue(f.key).value=it},label={Text(f.label)},modifier=Modifier.fillMaxWidth(),singleLine=!f.multiline,minLines=if(f.multiline)3 else 1,shape=RoundedCornerShape(14.dp),keyboardOptions=androidx.compose.foundation.text.KeyboardOptions(keyboardType=if(f.number && f.key !in listOf("returnBelow","returnAbove","minMargin","minGrowth","ProfitLossForPeriod","ProfitLossBeforeTax","CashFlowsFromUsedInOperatingActivities","return","benchmarkReturn"))androidx.compose.ui.text.input.KeyboardType.Decimal else androidx.compose.ui.text.input.KeyboardType.Text));if(f.helper.isNotBlank())Caption(f.helper)}
