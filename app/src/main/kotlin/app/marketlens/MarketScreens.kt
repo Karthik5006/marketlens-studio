@@ -20,7 +20,7 @@ import java.time.LocalDate
 import kotlin.math.*
 
 @Composable internal fun MarketsScreen(s:LensState,vm:LensViewModel,a:UiActions,search:()->Unit){
- var mode by rememberSaveable{mutableStateOf("New highs")};var limit by rememberSaveable{mutableIntStateOf(25)}
+ var mode by rememberSaveable{mutableStateOf("New highs")};var limit by rememberSaveable{mutableIntStateOf(25)};var rangeFilter by rememberSaveable{mutableStateOf("All exchange events")}
  Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Label("Your market, in focus",Lime);Text("Find the\nnext opportunity.",fontSize=36.sp,lineHeight=40.sp,color=Ink,fontWeight=FontWeight.Bold,modifier=Modifier.padding(top=10.dp))};Box(Modifier.size(66.dp).background(Violet.copy(alpha=.12f),CircleShape),contentAlignment=Alignment.Center){Icon(Icons.Rounded.TravelExplore,null,tint=Violet,modifier=Modifier.size(34.dp))}}
  Caption("Official exchange data. A clearer view of the extremes.")
  Surface(onClick=search,shape=RoundedCornerShape(17.dp),color=Panel,border=BorderStroke(1.dp,Line)){Row(Modifier.fillMaxWidth().padding(16.dp),verticalAlignment=Alignment.CenterVertically){Icon(Icons.Rounded.Search,null,tint=Muted,modifier=Modifier.size(20.dp));Spacer(Modifier.width(12.dp));Text("Search stocks & companies",color=Muted,fontSize=14.sp);Spacer(Modifier.weight(1f));Icon(Icons.Rounded.NorthEast,null,tint=Lime,modifier=Modifier.size(18.dp))}}
@@ -35,9 +35,16 @@ import kotlin.math.*
  }else{
   ErrorLine(s,if(mode=="New lows")"lows"else "highs"){vm.refreshMarkets()}
   if(feed!=null){Caption("${feed.stamp} IST · ${feed.hits.size} stocks${if(feed.saved)" · saved download"else ""}");if(feed.issue.isNotEmpty())Caption(feed.issue,Pink)
-   feed.hits.take(limit).forEach{h->StockTile(h.stock,h.last,h.change,"Touched ${rupees(h.level)}"){a.stock(h.stock.symbol)}}
+   ChoiceRow(listOf("All exchange events","Established range"),rangeFilter){rangeFilter=it;limit=25}
+   Caption("These are intraday range events, not a statement that the last price is still at the extreme. New listings can appear in both lists before a full year of history exists.")
+   val session=runCatching{LocalDate.parse(feed.stamp.take(11),java.time.format.DateTimeFormatter.ofPattern("dd-MMM-uuuu",java.util.Locale.ENGLISH))}.getOrDefault(LocalDate.now(java.time.ZoneId.of("Asia/Kolkata")))
+   val other=(if(mode=="New lows")s.highs else s.lows)?.takeIf{it.stamp.take(11)==feed.stamp.take(11)}?.hits.orEmpty().map{it.stock.symbol}.toSet()
+   val visible=feed.hits.filter{rangeFilter!="Established range"||MarketExtremes.hasYearHistory(it,session)}
+   Caption("${visible.size} shown / ${feed.hits.size} exchange rows. Established range excludes known listings under a year and rows without a prior reference.")
+   visible.take(limit).forEach{h->StockTile(h.stock,h.last,h.change,MarketExtremes.note(h,mode!="New lows",h.stock.symbol in other,session)){a.stock(h.stock.symbol)}}
    if(feed.hits.isEmpty())EmptyState("No extremes reported","The exchange returned an empty list for this session.")
-   if(feed.hits.size>limit)Action("Show 25 more",{limit+=25},modifier=Modifier.fillMaxWidth())
+   if(visible.isEmpty()&&feed.hits.isNotEmpty())EmptyState("No established ranges in this view","Choose All exchange events to include new listings and rows with an unavailable prior range.")
+   if(visible.size>limit)Action("Show 25 more",{limit+=25},modifier=Modifier.fillMaxWidth())
   }
  }
  LensCard(accent=Violet){Label("Go deeper",Violet);Text("Research with context.",color=Ink,fontSize=22.sp,fontWeight=FontWeight.SemiBold);Caption("Screen fundamentals, inspect ownership and see the companies hidden inside your funds.");Action("Open research studio",{a.route("Research")},icon=Icons.Rounded.AutoGraph)}

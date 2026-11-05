@@ -1,6 +1,6 @@
 # Play submission preparation
 
-App ID: `app.marketlens.studio` (separate from `app.marketlens`). Version 1.1.0 / code 2. Debug ID: `app.marketlens.studio.debug`.
+App ID: `app.marketlens.studio` (separate from `app.marketlens`). Version 1.2.0 / code 3. Debug ID: `app.marketlens.studio.debug`.
 Publisher: karthik. Support: ykn5006@gmail.com.
 
 Implemented preparation:

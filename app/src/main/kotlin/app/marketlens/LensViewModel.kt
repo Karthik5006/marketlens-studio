@@ -22,6 +22,7 @@ internal data class LensState(
  fun watch():Set<String>{val a=profile().data.optJSONArray("watchlist")?:return emptySet();return (0 until a.length()).map{a.optString(it)}.toSet()}
  fun rows(kind:String)=records.filter{it.kind==kind}
  fun settings()=json("settings")
+ fun allIpos():List<Research.Ipo> = (ipos+rows("exchangeIpo").mapNotNull{runCatching{Research.Ipo.from(JSONObject(it.json))}.getOrNull()}).groupBy{it.id()}.values.map{versions->versions.maxBy{it.fetched}}.sortedByDescending{it.start}
 }
 internal class LensViewModel(app:Application):AndroidViewModel(app){
  private val _state=MutableStateFlow(LensState());val state=_state.asStateFlow()
@@ -52,7 +53,9 @@ internal class LensViewModel(app:Application):AndroidViewModel(app){
  fun toggleWatch(symbol:String)=task("watch"){repo.edit{val a=it.data.optJSONArray("watchlist")?:JSONArray();val list=(0 until a.length()).map{a.optString(it)}.toMutableSet();if(!list.remove(symbol))list+=symbol;it.data.put("watchlist",JSONArray(list.toList()))}}
  fun refreshPortfolio(){val symbols=(_state.value.watch()+_state.value.profile().positions().map{it.symbol}).toList();task("portfolio"){var count=0;var failed=0;symbols.take(100).forEach{symbol->runCatching{repo.quote(symbol,true)}.onSuccess{q->_state.update{it.copy(quotes=it.quotes+(symbol to q))};count++}.onFailure{failed++}};message("$count quotes refreshed · $failed unavailable");AlertWorker.deliver(getApplication(),repo,_state.value.settings())}}
  fun syncFunds()=task("funds"){val status=repo.syncFunds{message(it)};_state.update{it.copy(funds=repo.legacy.portfolios())};message(status)}
- fun loadIpos(force:Boolean=false)=task("ipos"){val feeds=withContext(Dispatchers.IO){repo.research.issues(force)};_state.update{it.copy(ipoFeeds=feeds,ipos=Research.merge(feeds))}}
+ fun loadIpos(force:Boolean=false)=task("ipos"){val feeds=repo.ipoFeeds(force);_state.update{it.copy(ipoFeeds=feeds,ipos=Research.merge(feeds))}}
+ suspend fun importBsePage(raw:String):Int{val issues=withContext(Dispatchers.Default){BseIssues.parse(raw)};repo.saveExchangeIssues(issues);message("Saved ${issues.size} BSE issues from the displayed original table");return issues.size}
+ suspend fun saveExchangeIssue(issue:Research.Ipo){repo.saveExchangeIssues(listOf(issue))}
  fun issueInfo(i:Research.Ipo,force:Boolean=false)=task("issue:${i.id()}"){val value=withContext(Dispatchers.IO){repo.research.issueInfo(i,force)};if(!value.saved){val summary=value.bids.joinToString("\n"){it[0]+": "+it[1]+" shares / "+it[2]+" applications"};repo.dao.snapshot(SourceSnapshot("ipo-bids:${i.id()}:${value.fetched}",JSONObject().put("summary",summary).toString(),value.source,value.stamp,value.fetched,value.issue))};_state.update{it.copy(info=it.info+(i.id() to value))}}
  fun loadGmp(provider:String,force:Boolean=false)=task("gmp:$provider"){val feed=withContext(Dispatchers.IO){repo.research.gmp(provider,force)};repo.edit{s->feed.rows.forEach{s.observe(it,feed.stamp,feed.fetched)}};_state.update{it.copy(gmp=it.gmp+(provider to feed))}}
  fun ensureQuotes(){if(!::repo.isInitialized)return

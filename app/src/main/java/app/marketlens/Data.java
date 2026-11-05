@@ -3,8 +3,8 @@ import java.util.*;
 import org.json.*;
 
 final class Data {
- static final class Stock {String symbol="",name="",isin="",series="EQ";Stock(){}Stock(String s,String n,String i){symbol=s;name=n;isin=i;}String label(){return symbol+" · "+name;}}
- static final class Hit {Stock stock;double last=Double.NaN,level=Double.NaN,change=Double.NaN;}
+ static final class Stock {String symbol="",name="",isin="",series="EQ",listed="";Stock(){}Stock(String s,String n,String i){symbol=s;name=n;isin=i;}String label(){return symbol+" · "+name;}}
+ static final class Hit {Stock stock;String previousDate="";double last=Double.NaN,level=Double.NaN,previousLevel=Double.NaN,change=Double.NaN;boolean priorRangeMissing(){return !Double.isFinite(previousLevel)||previousLevel<=0||Parse.canonical(previousDate).isEmpty();}}
  static final class Screen {String stamp="",issue="";boolean saved;long fetched;List<Hit> hits=new ArrayList<>();}
  static final class Quote {String stamp="",issue="",isin="",series="EQ",industry="",highDate="",lowDate="";boolean saved;long fetched;double last=Double.NaN,change=Double.NaN,low=Double.NaN,high=Double.NaN,pe=Double.NaN,cap=Double.NaN,face=Double.NaN;}
  static final class Financial {String end="",start="",basis="",source="",issue="",revenueLabel="Revenue from operations";boolean saved;long fetched;double revenue=Double.NaN,profit=Double.NaN,eps=Double.NaN,debtEquity=Double.NaN;Financial previous,yearAgo;}

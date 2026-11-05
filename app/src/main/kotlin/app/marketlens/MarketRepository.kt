@@ -29,6 +29,19 @@ internal class MarketRepository private constructor(private val context:Context)
   archiveFunds()
  }
  suspend fun profile():InvestorState=InvestorState(dao.record("profile")?.json?:"{}")
+ suspend fun saveExchangeIssues(issues:List<Research.Ipo>)=mutex.withLock{db.withTransaction{
+  issues.forEach{dao.put(LocalRecord("exchangeIpo:${it.id()}","exchangeIpo",it.json().toString()))}
+  val state=profile();var changed=false
+  issues.forEach{if(state.tracked(it.id())){state.track(it,true);changed=true}}
+  if(changed)dao.put(LocalRecord("profile","profile",state.toString()))
+ }}
+ suspend fun ipoFeeds(force:Boolean):List<Research.Feed<Research.Ipo>> = withContext(Dispatchers.IO){
+  val nse=research.issues(force)
+  val bse=Research.Feed<Research.Ipo>();bse.source=BseIssues.PAGE
+  try{val result=legacy.net.get(BseIssues.PAGE,300_000,force);bse.rows=BseIssues.fromHtml(result.text(),result.url,result.fetched);bse.meta(result)}
+  catch(e:Exception){bse.issue="BSE list unavailable · ${Net.message(e)}. Open the original BSE page and read its displayed IPO table; an NSE-only result does not cover BSE-only issues."}
+  nse+bse
+ }
  suspend fun edit(action:(InvestorState)->Unit)=mutex.withLock{db.withTransaction{val state=profile();action(state);dao.put(LocalRecord("profile","profile",state.toString()))}}
  suspend fun save(kind:String,id:String=java.util.UUID.randomUUID().toString(),j:JSONObject){dao.put(LocalRecord(id,kind,j.toString()))}
  suspend fun archiveFunds(){legacy.portfolios().forEach{p->val key="fund:${p.id}:${p.date}";if(dao.snapshot(key)==null)dao.snapshot(SourceSnapshot(key,p.json().toString(),p.source,p.date,p.fetched))}}

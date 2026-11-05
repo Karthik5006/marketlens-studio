@@ -21,13 +21,14 @@ See Indian investments with more context. MarketLens Studio combines source-link
 • Rank stocks by covered holding schemes with small-cap, mid-cap, large-cap, flexi-cap and overall fund filters. Inspect sources and matched-month changes, follow stocks and export your view.
 • Save custom research filters, review allocation drift and explore clearly labelled scenarios.
 • Follow NSE IPO dates and original issue documents. Keep a manual account-by-account application, blocked-capital, allotment and sale journal.
+• Read supported BSE public-issue tables from the original website, or record original-source facts when access/layouts fail. Inspect subscription percentages and conditional category allotment scenarios with explicit inputs and source dates.
 • Read separately labelled unofficial GMP publisher reports and snapshots observed by the app.
 • Reconcile dividend records and maintain dated equity acquisition/sale lots with FIFO reports and CSV exports.
 • Enable optional periodic alerts with quiet hours and network controls.
 
 Personal investment records remain in the app's private Android storage. No broker login, trading permission, mandatory account, ads or analytics SDK. Imports and exports use files you select.
 
-Coverage matters. Automatic fund sync covers supported PPFAS and HDFC equity disclosures; other AMCs require importing their original files. Native exchange feeds use NSE; BSE originals open in your browser. Sources may be delayed, unavailable or incomplete, and each screen shows dates and coverage. Supplemental statements, fund factsheets, personal transactions and IPO status are user-entered records.
+Coverage matters. Automatic fund sync covers supported PPFAS and HDFC equity disclosures; other AMCs require importing their original files. Native exchange feeds use NSE; BSE IPO tables depend on original-site access/layouts, with an optional source viewer and labelled manual entry when needed. Sources may be delayed, unavailable or incomplete, and screens show dates and coverage. Supplemental statements, fund factsheets, personal transactions, category allocations/scenario inputs and IPO status can be user-entered records. Allotment scenarios are conditional calculations, not registrar results or guaranteed probabilities.
 
 MarketLens Studio is an independent research and record-keeping tool. It is not affiliated with NSE, BSE, AMFI, AMCs or GMP publishers. It does not execute trades or provide personalized investment advice. GMP is unofficial and unregulated. Scenarios and tax previews are illustrative and do not promise returns or replace review of original records and applicable rules.
 

@@ -28,3 +28,6 @@ The app is intended for adults researching investments. It provides source-repor
 
 Changes
 Updates to data handling will be reflected in this policy and the app. A material change that requires consent will be presented before the relevant feature is enabled.
+
+Optional BSE source viewer
+When you open the BSE source viewer, its original public-issues website loads in an embedded Android WebView. BSE and resources used by its website receive browser requests under their own policies. First-party cookies and site storage may be kept inside this app; third-party cookies, geolocation, file and content access are disabled. Studio reads only displayed public-issue tables after you select Read displayed IPOs. It does not read passwords, place orders or automate access challenges. Erase Studio data clears this browsing data along with all app data. You may use your external browser instead.

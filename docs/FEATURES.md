@@ -1,4 +1,4 @@
-# MarketLens Studio 1.1 — features 3–10
+# MarketLens Studio 1.2 — features 3–10
 
 ## 3. Funds and stock ownership
 
@@ -34,9 +34,11 @@ Android can defer WorkManager jobs; notification permission and network/source a
 
 ## 8. IPO lifecycle
 
+Studio 1.2 adds an original BSE table reader with an explicit official WebView import and a labelled manual-source fallback when direct access/layouts fail. BSE coverage errors remain visible; automatic complete BSE coverage is not claimed. Source multiples convert to subscription percentages; category ratios require original allocations. Conditional minimum-unit lottery scenarios use category shares, lot/minimum units and application counts, with provisional/validated-input labels and source timestamps. No exact registrar probability is inferred from total share subscription. See [IPO and range methods](IPO-AND-RANGE-FIXES.md).
+
 NSE lists and source series, date/board filters, original issue/offer-document/registrar links, reported bid categories, observed bid snapshots, illustrative lot arithmetic and local document-backed research notes. Application account nicknames, mandate/block/release state, partial allotment, partial sales, net realized profit, blocked-capital overview, exports and tracked-date background reminders.
 
-Lifecycle entries are manual. Automatic allotment/registrar verification, BSE-only native coverage, automatic RHP financial extraction and automatic eligibility/category-rule evaluation are not included. Follow the original issue terms.
+Lifecycle entries are manual. Automatic allotment/registrar verification, unattended complete BSE-only coverage, automatic RHP financial extraction and automatic eligibility/category-rule evaluation are not included. Follow the original issue terms.
 
 ## 9. GMP
 

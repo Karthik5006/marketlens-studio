@@ -33,3 +33,6 @@ No accounts can be created. The account-deletion workflow for apps that create a
 - https://support.google.com/googleplay/android-developer/answer/10787469
 - https://support.google.com/googleplay/android-developer/answer/10144311
 - https://support.google.com/googleplay/android-developer/answer/13849271
+
+## Studio 1.2 optional BSE viewer
+The optional embedded BSE website can make browser requests and store first-party site data under BSE policies. Third-party cookies, geolocation and local file/content access are disabled; no native JavaScript bridge is exposed. Read displayed IPOs extracts public table cells only on explicit action. Review the website traffic and applicable user-controlled web-content treatment in Play Console rather than declaring that the entire WebView experience collects nothing. Erasing app data also clears WebView data.
