@@ -1,0 +1,23 @@
+.gradle/
+build/
+app/build/
+local.properties
+.signing/
+*.jks
+*.keystore
+releases/
+.tools/
+*.log
+signing.properties
+*.aab
+*.apk
+*.idsig
+*.hprof
+# Research downloads stay local; only the small verification fixtures are versioned.
+/research/*
+!/research/v2/
+/research/v2/*
+!/research/v2/history.txt
+!/research/v2/history-year-complete.json
+!/research/v2/hdfc-sample.xlsx
+!/research/v2/README.md

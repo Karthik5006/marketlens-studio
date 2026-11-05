@@ -1,0 +1,36 @@
+CORE CHECKS
+Passed 91 checks against captured official NSE and AMC files.
+
+FRESH OFFICIAL SOURCE CHECKS
+PASS NSE highs: 59 rows; source 04-Nov-2026 16:00:27
+PASS NSE lows: 51 rows; source 04-Nov-2026 16:00:27
+PASS native HTTP client + current quote schema: 04-Nov-2026 16:00:00
+PASS current integrated filing: Consolidated 2026-09-30
+PASS company MF ownership: 2026-09-30; 2 named holders
+PASS official AMC workbook: Parag Parikh Flexi Cap Fund; 2026-09-30; 88 rows
+PASS official AMC workbook: Parag Parikh ELSS Tax Saver Fund; 2026-09-30; 46 rows
+PASS official AMC workbook: Parag Parikh Conservative Hybrid Fund; 2026-09-30; 28 rows
+PASS official AMC workbook: Parag Parikh Arbitrage Fund ; 2026-09-30; 82 rows
+PASS official AMC workbook: Parag Parikh Dynamic Asset Allocation Fund ; 2026-09-30; 40 rows
+PASS official AMC workbook: Parag Parikh Large Cap Fund; 2026-09-30; 101 rows
+PASS: 11 live source/schema checks, no fabricated fallback data.
+
+EQUITY-ONLY PORTFOLIO REGRESSION
+PASS equity-only scheme parse: Parag Parikh Flexi Cap Fund; 2026-09-30; 52 equity holdings
+PASS equity-only scheme parse: Parag Parikh ELSS Tax Saver Fund; 2026-09-30; 41 equity holdings
+PASS equity-only scheme parse: Parag Parikh Conservative Hybrid Fund; 2026-09-30; 7 equity holdings
+PASS equity-only scheme parse: Parag Parikh Arbitrage Fund; 2026-09-30; 72 equity holdings
+PASS equity-only scheme parse: Parag Parikh Dynamic Asset Allocation Fund; 2026-09-30; 25 equity holdings
+PASS equity-only scheme parse: Parag Parikh Large Cap Fund; 2026-09-30; 101 equity holdings
+PASS: 6 captured live workbooks; 298 physical equity rows; debt/derivatives excluded.
+
+ANDROID UI / OFFLINE CHECKS (SEEDED VERIFIED RESPONSES)
+PASS Both cached exchange lists render with source date
+PASS Low toggle changes rows and retains saved-data label
+PASS Search opens the selected stock detail
+PASS Saved quote and annual range render
+PASS Save stock persists watchlist selection
+PASS Holdings jump displays exact-ISIN scheme matches
+PASS Watchlist retains the quote source timestamp
+PASS Fund coverage page shows six saved disclosures
+PASS: 8 Android UI/offline checks with verified source responses. No trades.

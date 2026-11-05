@@ -1,0 +1,30 @@
+MarketLens Studio — Privacy Policy
+Effective date: 5 November 2026
+Publisher: karthik
+Contact: ykn5006@gmail.com
+
+MarketLens Studio is an independent investment research and local portfolio-record app. It is separate from the original MarketLens app. It does not create accounts, connect to brokers, place orders or require PAN, bank credentials, contacts, location, microphone or camera access.
+
+Data on your device
+Positions, costs, transaction lots, account nicknames, dividend entries, IPO applications, notes, alert thresholds, imported files, source snapshots and preferences are stored in this app's private Android storage. The app has no developer-operated backend, advertising, analytics or crash-reporting SDK. These personal records are not uploaded by the app.
+
+Requests to data providers
+When you load or refresh market data, the app makes HTTPS requests to NSE, supported AMC disclosure sites and, when you open the GMP section, the selected unofficial publisher. Requests include the requested stock symbol, public issue identifier, date range or disclosure URL as needed. The receiving provider also receives ordinary network metadata such as your IP address and the app's user-agent. These providers operate under their own terms and privacy policies; the publisher does not control their server logs. A requested symbol can reveal an investment interest. Your quantities, acquisition costs, account nicknames, personal notes and transaction ledger are not included in these requests.
+
+Background checks and notifications
+Background checks are off by default. When you enable them, scheduled jobs request data for watched/held stocks, saved thresholds and tracked IPOs while the app is closed. Android can defer these jobs. Notification permission is optional. You can disable checks, use unmetered connections only, set quiet hours or remove individual thresholds in Settings. Local alerts can appear on your lock screen according to your Android notification settings.
+
+Files, exports and external links
+Import reads only the file you select with Android's document picker. Export writes an unencrypted file only to the destination you choose; a chosen cloud document provider may upload it under that provider's policy. Keep exported financial records private. Original-source links open your browser. Support email opens your email app; nothing is sent automatically.
+
+Security and retention
+Connections made by the app use HTTPS. Local records use Android's app sandbox and device encryption when configured; the app does not claim a separate encrypted vault or biometric lock. Android backup and app-data transfer are disabled in the app configuration. Records remain until you remove them, erase Studio data in Settings, clear the app's storage or uninstall it. Your independently saved exports, browser history and providers' server logs are not deleted by clearing this app.
+
+Your choices
+You can inspect and delete individual records, remove saved disclosures, disable background checks, export your records or erase all Studio data. No account-deletion request is needed because this app does not create accounts. Contact ykn5006@gmail.com for privacy questions; avoid emailing sensitive financial files unless you intend to share them.
+
+Audience and financial information
+The app is intended for adults researching investments. It provides source-reported information and user-directed calculations, not personalized investment advice, brokerage services or guaranteed returns. Market data can be delayed or incomplete. GMP is unofficial and unregulated. The app is not affiliated with or endorsed by NSE, BSE, AMFI, any AMC or GMP publisher.
+
+Changes
+Updates to data handling will be reflected in this policy and the app. A material change that requires consent will be presented before the relevant feature is enabled.

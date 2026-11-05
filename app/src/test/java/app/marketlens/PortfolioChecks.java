@@ -1,0 +1,5 @@
+package app.marketlens;
+import java.io.*;import java.nio.file.*;import java.util.*;import org.json.*;
+public final class PortfolioChecks {
+ public static void main(String[] args)throws Exception{Net net=new Net(new File("build/live-cache"));Net.Result page=net.peek(Repository.PPFAS);JSONArray snapshots=new JSONArray();int total=0;for(Map.Entry<String,String[]> e:Repository.fundLinks(page.text()).entrySet()){String[] source=e.getValue();Net.Result r=net.peek(source[0]);if(r==null)throw new AssertionError("Missing freshly downloaded workbook");List<Data.Portfolio> list=Xlsx.portfolios(r.bytes,"",source[1],source[0]);if(list.size()!=1)throw new AssertionError("Scheme count");Data.Portfolio p=list.get(0);p.id="ppfas:"+e.getKey();p.imported=false;p.fetched=r.fetched;total+=p.holdings.size();snapshots.put(p.json());System.out.println("PASS equity-only scheme parse: "+p.name+"; "+p.date+"; "+p.holdings.size()+" equity holdings");}Files.write(Paths.get("build/live-portfolios.json"),snapshots.toString().getBytes("UTF-8"));System.out.println("PASS: 6 captured live workbooks; "+total+" physical equity rows; debt/derivatives excluded.");}
+}

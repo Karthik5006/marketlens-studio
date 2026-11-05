@@ -1,0 +1,20 @@
+package app.marketlens;
+import java.util.*;
+import org.json.*;
+
+final class Data {
+ static final class Stock {String symbol="",name="",isin="",series="EQ";Stock(){}Stock(String s,String n,String i){symbol=s;name=n;isin=i;}String label(){return symbol+" · "+name;}}
+ static final class Hit {Stock stock;double last=Double.NaN,level=Double.NaN,change=Double.NaN;}
+ static final class Screen {String stamp="",issue="";boolean saved;long fetched;List<Hit> hits=new ArrayList<>();}
+ static final class Quote {String stamp="",issue="",isin="",series="EQ",industry="",highDate="",lowDate="";boolean saved;long fetched;double last=Double.NaN,change=Double.NaN,low=Double.NaN,high=Double.NaN,pe=Double.NaN,cap=Double.NaN,face=Double.NaN;}
+ static final class Financial {String end="",start="",basis="",source="",issue="",revenueLabel="Revenue from operations";boolean saved;long fetched;double revenue=Double.NaN,profit=Double.NaN,eps=Double.NaN,debtEquity=Double.NaN;Financial previous,yearAgo;}
+ static final class Holder {String name="";double shares=Double.NaN,percent=Double.NaN;}
+ static final class Ownership {String date="",source="",issue="";boolean saved;long fetched;double promoter=Double.NaN,publicPct=Double.NaN,mutual=Double.NaN,fundCount=Double.NaN,foreign=Double.NaN,pledged=Double.NaN;Ownership previous;List<Holder> holders=new ArrayList<>();}
+ static final class Holding {String fund="",isin="",stock="",asOf="",source="",industry="";double shares=Double.NaN,weight=Double.NaN;JSONObject json()throws JSONException{JSONObject j=new JSONObject();j.put("fund",fund);j.put("isin",isin);j.put("stock",stock);j.put("industry",industry);j.put("asOf",asOf);j.put("source",source);if(Double.isFinite(shares))j.put("shares",shares);if(Double.isFinite(weight))j.put("weight",weight);return j;}static Holding from(JSONObject j){Holding h=new Holding();h.fund=j.optString("fund");h.isin=j.optString("isin");h.stock=j.optString("stock");h.industry=j.optString("industry");h.asOf=j.optString("asOf");h.source=j.optString("source");h.shares=Parse.number(j.opt("shares"));h.weight=Parse.number(j.opt("weight"));return h;}}
+ static final class Portfolio {String id="",name="",date="",source="",issue="";boolean imported,saved;long fetched;List<Holding> holdings=new ArrayList<>();JSONObject json()throws JSONException{JSONObject j=new JSONObject();j.put("id",id);j.put("name",name);j.put("date",date);j.put("source",source);j.put("imported",imported);j.put("fetched",fetched);JSONArray rows=new JSONArray();for(Holding h:holdings)rows.put(h.json());j.put("holdings",rows);return j;}static Portfolio from(JSONObject j){Portfolio p=new Portfolio();p.id=j.optString("id");p.name=j.optString("name");p.date=j.optString("date");p.source=j.optString("source");p.imported=j.optBoolean("imported");p.fetched=j.optLong("fetched");JSONArray a=j.optJSONArray("holdings");if(a!=null)for(int i=0;i<a.length();i++){JSONObject row=a.optJSONObject(i);if(row!=null)p.holdings.add(Holding.from(row));}return p;}}
+ static double position(double value,double low,double high){return Double.isFinite(value)&&Double.isFinite(low)&&Double.isFinite(high)&&high>low?Math.max(0,Math.min(1,(value-low)/(high-low))):Double.NaN;}
+ static double margin(double profit,double revenue){return Double.isFinite(profit)&&Double.isFinite(revenue)&&revenue>0?profit/revenue*100:Double.NaN;}
+ static String symbol(String s){return s==null?"":s.trim().toUpperCase(Locale.ROOT);}
+ static boolean validSymbol(String s){return s!=null&&s.matches("[A-Z0-9&._-]{1,32}");}
+ static boolean isin(String s){if(s==null||!s.matches("[A-Z]{2}[A-Z0-9]{9}[0-9]"))return false;StringBuilder digits=new StringBuilder();for(char c:s.toCharArray())digits.append(c>='A'&&c<='Z'?Integer.toString(c-'A'+10):Character.toString(c));int sum=0;boolean doubled=false;for(int i=digits.length()-1;i>=0;i--){int n=digits.charAt(i)-'0';if(doubled)n*=2;sum+=n/10+n%10;doubled=!doubled;}return sum%10==0;}
+}

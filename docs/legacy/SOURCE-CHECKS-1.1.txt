@@ -1,0 +1,41 @@
+DATA CHECKS
+Passed 91 checks against captured official NSE and AMC files.
+Passed 93 investor/holdings/IPO/GMP checks.
+
+
+FRESH SOURCE CHECKS
+PASS live official IPO feed: https://www.nseindia.com/api/ipo-current-issue; 1 source rows
+PASS live official IPO feed: https://www.nseindia.com/api/all-upcoming-issues?category=ipo; 0 source rows
+PASS live official IPO feed: https://www.nseindia.com/api/public-past-issues; 1493 source rows
+PASS live issue detail: VPFL; lot 1200; upper band 94; Updated as on 04-Nov-2026 19:00:02 hrs
+PASS original GMP publisher: InvestorGain; 25 rows; page 2026-11-05T03:48:02.584Z
+PASS original GMP publisher: IPOWatch; 7 rows; page 2026-11-05T02:23:55+00:00
+PASS live SEDEMAC holdings audit: 2026-09-30; MF 20.57%; FPI 10.30%; FPI change +6.03 pp
+PASS live selected-stock quote: 05-Nov-2026 09:41:16
+PASS official disclosure feed: 30 events
+PASS official disclosure feed: 0 events
+PASS latest selected-stock financials: Standalone 2026-09-30
+PASS source comparison document: 2026-06-30
+PASS: 11 fresh source checks. No orders or applications.
+
+
+PUBLISHER ORIGIN RETEST
+PASS publisher-specific request origin: InvestorGain; 25 source rows
+PASS publisher-specific request origin: IPOWatch; 7 source rows
+
+
+NATIVE POSITION FORM
+PASS Native manual-position form saves 10 shares at 3000 plus 50 fees; cost 30050. Test-only emulator record, no order.
+
+
+IPO/GMP UI CHECKS
+PASS Official IPO records render from source data
+PASS Original IPO identity can be tracked locally
+PASS Official issue lot information is displayed
+PASS GMP has an explicit unofficial identity and publisher rows
+PASS Observed GMP history is source-labelled
+PASS Second original GMP publisher remains separate
+PASS: 6 Android investor UI/offline checks. No orders, applications or calendar events.
+
+
+The earlier UI batch passed navigation, update retention, source ownership, combined-group labels and name viewing. Dialog-label and keyboard-coordinate harness corrections are documented in VALIDATION-1.1.md.
