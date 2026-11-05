@@ -18,3 +18,11 @@ Studio uses version 1.1.0/code 2, the same app ID and upload key as Studio 1.0. 
 - GitHub Actions passed the complete unit suite and debug APK build for the feature commit.
 
 These checks do not constitute Google Play approval, all-AMC data coverage or physical S25 Ultra testing.
+
+## Installed release checks
+
+The signed 1.1 APK was installed over the existing 1.0 release on the disposable Android 10/API 29 emulator without clearing app data. The installed package reported version code 2/name 1.1.0. Observed checks passed for the new Most held section, radar hero/reporting month, dated coverage summary, ranked stock cards with scheme breadth and weights, expansion to the original named holding scheme, and the pre-existing TCS position after upgrade.
+
+The UI used the previously imported official HDFC Retirement Fund equity disclosure dated 30 September 2026: one scheme, one known AMC, 70 ISINs matching the bundled NSE directory. This is deliberately limited coverage, not an all-AMC result. The source parser recognizes 72 equity rows; two are outside this ranking's NSE directory. No personal portfolio screenshot was published.
+
+The software emulator needed a cold restart and non-streaming installation. Initial accessibility-root and scroll-limit attempts were inconclusive; the successful checks were observed across the final release checks and a resumed holder/retained-position flow. The 19 new unit tests separately verify all category rules and multi-scheme/month counting. No claim is made of a full automated end-to-end check of every UI filter or a physical S25 test.
