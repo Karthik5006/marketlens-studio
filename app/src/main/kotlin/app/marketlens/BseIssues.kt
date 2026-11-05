@@ -65,6 +65,8 @@ internal object BseIssues {
             for (r in headerIndex + 1 until minOf(rows.length(), 501)) {
                 val row = rows.optJSONObject(r) ?: continue
                 val cells = row.optJSONArray("cells") ?: continue
+                // Expanded/nested/virtualized rows can shift columns; reject instead of guessing offsets.
+                if (cells.length() != headers.size) continue
                 fun cell(vararg keys: String): String { val i = index(*keys); return if (i >= 0) cells.optString(i).trim() else "" }
                 val name = cell("companyname", "nameofcompany", "issuername", "nameofissuer", "securityname", "nameoftheissuer", "company")
                 val start = date(cell("opendate", "openingdate", "issueopendate", "issuestartdate", "startdate", "issueopeningdate", "biddingstartdate"))

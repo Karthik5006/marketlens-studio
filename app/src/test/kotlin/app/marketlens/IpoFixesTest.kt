@@ -141,6 +141,9 @@ class IpoFixesTest {
         val bad = row.toMutableList().also { it[1] = "30-Feb-2026" }
         BseIssues.parse(capture(headers, bad))
     }
+    @Test(expected = IllegalArgumentException::class) fun shiftedNestedRowsDoNotGuessFinancialColumns() {
+        BseIssues.parse(capture(headers, row + listOf("Nested cell")))
+    }
     @Test fun originalTableHtmlAndDomCaptureHaveEquivalentFacts() {
         val html = "<table><caption>SME</caption><tr>" + headers.joinToString("") { "<th>$it</th>" } + "</tr><tr>" + row.joinToString("") { "<td>$it</td>" } + "</tr></table>"
         val captured = BseIssues.parse(capture(headers, row)).single()
