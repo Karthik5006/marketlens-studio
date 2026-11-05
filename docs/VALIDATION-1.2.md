@@ -10,3 +10,9 @@
 See IPO-AND-RANGE-FIXES.md for the exact formulas, source/import workflow and limits. Passing calculations/build checks does not verify BSE accessibility or every table layout on the user's network, nor final registrar allotment or physical S25 Ultra behavior.
 
 The final release also passed scripts/verify-release.py: APK/AAB signatures, app/version identity, API 36 target, publisher/privacy text, 16 KB native ELF alignment and APK ZIP alignment. A new guard rejects rows whose cell counts differ from the recognized header, preventing nested/shifted financial columns from being guessed.
+
+## Installed Android release checks
+
+The final signed release was installed over Studio 1.1 in the disposable Android 10/API 29 emulator. Observed checks passed for version 1.2/code 3, the established-range filter, BCSSL's actual listing-day/range-since-listing label and dual NSE event explanation, the IPO BSE recovery/manual-entry actions, opening the original BSE viewer, the explicit public-table read control, the labelled original-source form and retention of the pre-existing TCS position. These were observed across the main and resumed UI flows; initial screen-sleep/gesture timing attempts were inconclusive.
+
+Five original NSE responses were explicitly placed in this emulator's private cache, preserving their host-download timestamps. This verifies offline rendering/source-date handling, not direct emulator network access. The viewer could not read live BSE data in this environment. No live Antala capture, final subscription/application inputs, full end-to-end allotment-scenario form save or physical S25 test is claimed. Formula/source-parser behavior is covered separately by the unit suite. No fixture market data are bundled in production assets.
