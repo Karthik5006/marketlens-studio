@@ -1,10 +1,12 @@
-# MarketLens Studio 1.0 — features 3–10
+# MarketLens Studio 1.1 — features 3–10
 
 ## 3. Funds and stock ownership
 
 Exact-ISIN scheme matches, correctly labelled combined shareholder disclosures, promoter/MF/FPI ownership movement and source-extractable pledges. PPFAS plus supported HDFC monthly equity portfolios; other AMCs via XLSX/CSV import. Weighted fund overlap, saved-period position changes, manually entered fund valuations, direct-plus-fund company/industry exposure and explicitly dated user-entered factsheet metrics.
 
 Automatic coverage is not all-AMC. Historical changes start with snapshots actually saved by the app. Expense ratios, scheme returns and tracking error are recorded from user-selected original factsheets, not automatically collected across every AMC.
+
+**Mutual Fund Radar:** monthly most-held-stock rankings with overall/small-cap/mid-cap/large-cap/flexi-cap/other/unclassified scheme filters, known AMC breadth, percentage of covered schemes, average disclosed fund-asset weights, holder drill-downs, category breakdowns, search, minimum-holder thresholds, watchlist filtering and CSV export. Count one recognized NSE equity ISIN per scheme; normalize direct/regular and growth/IDCW suffixes within a known fund house. Compare only schemes with recognized equity rows in both adjacent months. Category/AMC labels can be reviewed and saved locally. This is a ranking of covered disclosures, not an industry-wide league table. See [methodology](FUND-RADAR.md).
 
 ## 4. Fundamentals and research
 

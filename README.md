@@ -2,12 +2,14 @@
 
 A separate Android investment-research app for Indian stocks, fund disclosures, IPOs and private portfolio records. Native Kotlin/Jetpack Compose UI, ViewModel/StateFlow, source repositories, Room and optional WorkManager alerts.
 
-- Production app: `app.marketlens.studio`, version 1.0.0; Android 10+; target API 36.
+- Production app: `app.marketlens.studio`, version 1.1.0; Android 10+; target API 36.
 - Debug app: `app.marketlens.studio.debug`.
 - Original `app.marketlens` is a separate app and is not replaced. Transfer older investor records only through a file you choose.
 - Publisher: karthik; support: ykn5006@gmail.com.
 
 See [features and coverage](docs/FEATURES.md), [architecture](ARCHITECTURE.md), [privacy](play-store/privacy-policy.html) and [Play submission preparation](play-store/RELEASE-READINESS.md). Financial records are local and manual; source dates and coverage remain visible. The app does not place orders or provide personalized recommendations.
+
+**New in 1.1: Mutual Fund Radar.** Funds → Most held ranks stocks by the number of distinct covered schemes holding them. Filter by small-cap, mid-cap, large-cap, flexi-cap or overall, inspect holding schemes and disclosed weights, compare matched-month additions/absences, follow stocks and export the filtered ranking. Dates, category labels, fund-house identity and coverage are explicit. [Methodology and usage](docs/FUND-RADAR.md).
 
 ## Build and test
 

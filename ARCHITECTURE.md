@@ -1,4 +1,4 @@
-# MarketLens Studio 1.0 architecture
+# MarketLens Studio architecture
 
 MarketLens is an offline-capable, single-activity Android app with a Compose interface and a unidirectional data flow. It has no server, broker authentication or trading access.
 
@@ -13,6 +13,7 @@ Android WorkManager → MarketRepository → notification channel / Room inbox
 - **Presentation:** Material 3, Compose Canvas charts, saveable tab/filter state, lifecycle-aware StateFlow collection. A shared design system provides cards, inputs, source metadata, animated transitions and allocation bars. Investor forms validate before closing.
 - **State:** ViewModel owns requests, loading/error state and source results. Requests execute outside the UI thread and a semaphore limits foreground work. A single repository owns persistent writes.
 - **Domain:** `Analytics` implements exact-ISIN weighted overlap, look-through exposure with explicit residuals, Wilder RSI, moving averages, drawdown, volatility, aligned-return correlation, FIFO fee allocation and IPO capital arithmetic. No buy/sell scores are manufactured.
+- **Mutual Fund Radar:** `FundPopularity` derives monthly scheme breadth from current portfolios and retained Room snapshots. It validates reporting dates, filters to the NSE equity directory, merges known-AMC plan aliases, chooses one snapshot per scheme/month and compares only a matched adjacent-month cohort. `FundPopularityScreen` computes the catalog and ranking on `Dispatchers.Default`; search/sort/pagination operate on the report. Optional category/AMC overrides are ordinary Room records, so no schema migration is necessary.
 - **Storage:** Room stores added investor records, observed source snapshots and the alert inbox. A new independent app sandbox starts empty; optional file transfer imports selected original MarketLens records with explicit conflict handling. Portfolio workbooks continue to use the existing private JSON store. Dated snapshots are archived in Room before replacements.
 - **Source adapters:** Existing allowlisted HTTPS clients and strict NSE identity/series matching are reused. PPFAS and supported HDFC XLSX disclosures are recognized; unsupported formats and empty responses produce visible errors. Originals remain linked.
 - **Scheduling:** Optional WorkManager jobs (minimum 15 minutes) use connected/unmetered constraints, rotate up to 10 symbols, establish a first-run filings baseline and deduplicate notifications. Quiet hours defer delivery. Android notification permission is requested only through an explicit action. WorkManager survives process death and reschedules after reboot; exact timing is not guaranteed.

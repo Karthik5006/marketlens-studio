@@ -30,7 +30,7 @@ for rel in ['app/build/outputs/apk/release/app-release.apk','app/build/outputs/b
   subprocess.run(['java','-jar',str(build_tools/'lib/apksigner.jar'),'verify',str(p)],check=True,stdout=subprocess.DEVNULL)
   metadata=subprocess.check_output([str(build_tools/'aapt2'),'dump','badging',str(p)],text=True)
   assert "package: name='app.marketlens.studio'" in metadata and "targetSdkVersion:'36'" in metadata
-  assert "versionName='1.0.0'" in metadata and "versionCode='1'" in metadata
+  assert "versionName='1.1.0'" in metadata and "versionCode='2'" in metadata
  else:
   signer=shutil.which('jarsigner') or '/workspace/android/toolchain/jdk17/bin/jarsigner'
   output=subprocess.check_output([signer,'-verify',str(p)],text=True,stderr=subprocess.STDOUT)

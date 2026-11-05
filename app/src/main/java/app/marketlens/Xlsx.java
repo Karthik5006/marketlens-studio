@@ -5,15 +5,18 @@ import java.util.*;
 import java.util.regex.*;
 import java.util.zip.*;
 import org.w3c.dom.*;
+import javax.xml.parsers.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 
 /** Reads ordinary, unencrypted OOXML portfolios. No macros or formula execution. */
 final class Xlsx {
  static List<Data.Portfolio> portfolios(byte[] bytes,String label,String asOf,String source)throws Exception{
-  if(bytes.length<4||bytes[0]!='P'||bytes[1]!='K')throw new IOException("Choose an .xlsx workbook, not the older .xls format");Map<String,byte[]> entries=new HashMap<>();int count=0,total=0;try(ZipInputStream zip=new ZipInputStream(new ByteArrayInputStream(bytes))){ZipEntry e;while((e=zip.getNextEntry())!=null){if(++count>1500)throw new IOException("Workbook contains too many parts");String name=e.getName();if(name.contains("..")||name.startsWith("/"))throw new IOException("Unsafe workbook path");if(!name.startsWith("xl/")||!name.endsWith(".xml"))continue;byte[] b=Net.read(zip,4*1024*1024);total+=b.length;if(total>32*1024*1024)throw new IOException("Expanded workbook is too large");entries.put(name,b);}}
+  if(bytes.length<4||bytes[0]!='P'||bytes[1]!='K')throw new IOException("Choose an .xlsx workbook, not the older .xls format");Map<String,byte[]> entries=new HashMap<>();int count=0,total=0;try(ZipInputStream zip=new ZipInputStream(new ByteArrayInputStream(bytes))){ZipEntry e;while((e=zip.getNextEntry())!=null){if(++count>1500)throw new IOException("Workbook contains too many parts");String name=e.getName();if(name.contains("..")||name.startsWith("/"))throw new IOException("Unsafe workbook path");if(!name.startsWith("xl/")||!name.endsWith(".xml"))continue;byte[] b=Net.read(zip,name.matches("xl/worksheets/sheet[0-9]+\\.xml")?8*1024*1024:4*1024*1024);total+=b.length;if(total>32*1024*1024)throw new IOException("Expanded workbook is too large");entries.put(name,b);}}
   List<String> strings=new ArrayList<>();if(entries.containsKey("xl/sharedStrings.xml"))for(Element si:Parse.elements(Parse.xml(entries.get("xl/sharedStrings.xml")),"si")){StringBuilder s=new StringBuilder();for(Element t:Parse.elements(si,"t"))s.append(t.getTextContent());strings.add(s.toString());}
   Set<Integer> percent=new HashSet<>();if(entries.containsKey("xl/styles.xml")){Document styles=Parse.xml(entries.get("xl/styles.xml"));Set<Integer> formats=new HashSet<>(Arrays.asList(9,10));for(Element format:Parse.elements(styles,"numFmt"))if(format.getAttribute("formatCode").replace("\\%","").contains("%"))formats.add(Integer.parseInt(format.getAttribute("numFmtId")));List<Element> xfs=Parse.elements(styles,"cellXfs");if(!xfs.isEmpty()){int index=0;for(Node child=xfs.get(0).getFirstChild();child!=null;child=child.getNextSibling())if(child instanceof Element&&"xf".equals(Parse.name(child))){if(formats.contains(Integer.parseInt(((Element)child).getAttribute("numFmtId"))))percent.add(index);index++;}}}
   Map<String,String> sheetNames=new HashMap<>();if(entries.containsKey("xl/workbook.xml")&&entries.containsKey("xl/_rels/workbook.xml.rels")){Map<String,String> targets=new HashMap<>();for(Element r:Parse.elements(Parse.xml(entries.get("xl/_rels/workbook.xml.rels")),"Relationship")){String t=r.getAttribute("Target");if(t.startsWith("/"))t=t.substring(1);else t="xl/"+t;targets.put(r.getAttribute("Id"),t);}for(Element s:Parse.elements(Parse.xml(entries.get("xl/workbook.xml")),"sheet")){String id=s.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships","id");sheetNames.put(targets.get(id),s.getAttribute("name"));}}
-  List<Data.Portfolio> out=new ArrayList<>();List<String> paths=new ArrayList<>(entries.keySet());Collections.sort(paths);for(String path:paths){if(!path.matches("xl/worksheets/sheet[0-9]+\\.xml"))continue;Document sheet=Parse.xml(entries.get(path));List<Element> rows=Parse.elements(sheet,"row");if(rows.size()>50000)throw new IOException("A worksheet exceeds 50,000 rows");int isinCol=-1,stockCol=-1,qtyCol=-1,weightCol=-1,industryCol=-1;String title="",embeddedDate="";Data.Portfolio portfolio=null;Set<String> duplicate=new HashSet<>();boolean derivatives=false;
+  List<Data.Portfolio> out=new ArrayList<>();List<String> paths=new ArrayList<>(entries.keySet());Collections.sort(paths);for(String path:paths){if(!path.matches("xl/worksheets/sheet[0-9]+\\.xml"))continue;Document sheet=worksheet(entries.get(path));List<Element> rows=Parse.elements(sheet,"row");if(rows.size()>50000)throw new IOException("A worksheet exceeds 50,000 value-bearing rows");int isinCol=-1,stockCol=-1,qtyCol=-1,weightCol=-1,industryCol=-1;String title="",embeddedDate="";Data.Portfolio portfolio=null;Set<String> duplicate=new HashSet<>();boolean derivatives=false;
    for(Element row:rows){Map<Integer,Cell> cells=new TreeMap<>();for(Node child=row.getFirstChild();child!=null;child=child.getNextSibling())if(child instanceof Element&&"c".equals(Parse.name(child))){Element c=(Element)child;int col=column(c.getAttribute("r"));String value=Parse.first(c,"v");if("s".equals(c.getAttribute("t"))){int index;try{index=Integer.parseInt(value);}catch(Exception e){continue;}if(index<0||index>=strings.size())throw new IOException("Invalid shared string reference");value=strings.get(index);}else if("inlineStr".equals(c.getAttribute("t")))value=Parse.first(c,"is");Cell cell=new Cell();cell.value=value.trim();try{cell.percent=percent.contains(Integer.parseInt(c.getAttribute("s")));}catch(Exception ignored){}cells.put(col,cell);}
     if(isinCol<0){for(Map.Entry<Integer,Cell> entry:cells.entrySet()){String value=entry.getValue().value,h=Parse.header(value);if(h.equals("isin")||h.equals("isincode"))isinCol=entry.getKey();if(h.contains("nameoftheinstrument")||h.equals("nameofinstrument")||h.equals("securityname"))stockCol=entry.getKey();if(h.startsWith("industry"))industryCol=entry.getKey();if(h.equals("quantity")||h.equals("noofshares"))qtyCol=entry.getKey();if(h.contains("netassets")||h.contains("tonav")||h.equals("weightpercent"))weightCol=entry.getKey();if(value.toLowerCase(Locale.ROOT).contains("fund")&&value.length()>title.length()&&value.length()<300&&!value.toLowerCase(Locale.ROOT).contains("statement")){title=value;int bracket=title.indexOf(" (");if(bracket>0)title=title.substring(0,bracket);}String d=embeddedDate(value);if(!d.isEmpty())embeddedDate=d;}
      if(isinCol>=0&&weightCol>=0){String date=Parse.canonical(asOf);if(!embeddedDate.isEmpty()){if(!date.isEmpty()&&!date.equals(embeddedDate))throw new IOException("Workbook date differs from the requested reporting date");date=embeddedDate;}if(date.isEmpty())throw new IOException("Enter this workbook's reporting date (YYYY-MM-DD)");portfolio=new Data.Portfolio();String fallback=sheetNames.containsKey(path)?sheetNames.get(path):"Worksheet";portfolio.name=(!label.isEmpty()?label:(title.isEmpty()?fallback:title)).trim();portfolio.date=date;portfolio.source=source;portfolio.id="import:"+portfolio.name.toLowerCase(Locale.ROOT);portfolio.imported=true;portfolio.fetched=System.currentTimeMillis();}else isinCol=-1;continue;}
@@ -21,6 +24,35 @@ final class Xlsx {
     isin=Data.symbol(isin);if(!Data.isin(isin)||!isin.startsWith("INE")||derivatives||stock.toLowerCase(Locale.ROOT).matches(".*(future|option|forward).*"))continue;double weight=Parse.number(at(cells,weightCol)),quantity=Parse.number(at(cells,qtyCol));Cell wc=cells.get(weightCol);if(wc!=null&&wc.percent&&!wc.value.endsWith("%"))weight*=100;if(!Double.isFinite(weight)||weight<0||weight>100||Double.isFinite(quantity)&&quantity<0)continue;if(!(weight>0||quantity>0))continue;if(!duplicate.add(isin))throw new IOException("Repeated stock ISIN in one portfolio; review the workbook before importing");Data.Holding h=new Data.Holding();h.fund=portfolio.name;h.isin=isin;h.stock=stock;h.industry=at(cells,industryCol);h.weight=weight;h.shares=quantity;h.asOf=portfolio.date;h.source=source;portfolio.holdings.add(h);
    }if(portfolio!=null&&!portfolio.holdings.isEmpty())out.add(portfolio);
   }if(out.isEmpty())throw new IOException("No recognized equity portfolio found. Use an ISIN/Quantity/% Net Assets .xlsx sheet or the CSV template.");return out;
+ }
+ /** Stream styled-but-empty cells away before building the DOM; never truncate value-bearing rows. */
+ private static Document worksheet(byte[] raw)throws Exception{
+  if(raw.length<=4*1024*1024)return Parse.xml(raw);
+  String guard=new String(raw,StandardCharsets.UTF_8).toUpperCase(Locale.ROOT);
+  if(guard.contains("<!DOCTYPE")||guard.contains("<!ENTITY"))throw new IOException("XML document types and entities are not allowed");
+  DocumentBuilderFactory df=DocumentBuilderFactory.newInstance();df.setNamespaceAware(true);
+  final String ns="http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+  Document doc=df.newDocumentBuilder().newDocument();Element root=doc.createElementNS(ns,"worksheet");doc.appendChild(root);
+  SAXParserFactory factory=SAXParserFactory.newInstance();factory.setNamespaceAware(true);factory.setValidating(false);
+  for(String flag:new String[]{"http://xml.org/sax/features/external-general-entities","http://xml.org/sax/features/external-parameter-entities","http://apache.org/xml/features/nonvalidating/load-external-dtd"})try{factory.setFeature(flag,false);}catch(Exception ignored){}
+  XMLReader reader=factory.newSAXParser().getXMLReader();reader.setEntityResolver((publicId,systemId)->new InputSource(new StringReader("")));
+  reader.setContentHandler(new DefaultHandler(){
+   Element row,cell;boolean valued;int rows;final Deque<Element> stack=new ArrayDeque<>();
+   private Element element(String name,Attributes a){Element e=doc.createElementNS(ns,name);for(int i=0;i<a.getLength();i++)e.setAttribute(a.getLocalName(i).isEmpty()?a.getQName(i):a.getLocalName(i),a.getValue(i));return e;}
+   @Override public void startElement(String uri,String local,String q,Attributes a){
+    String n=local.isEmpty()?q:local;
+    if(n.equals("row")){row=element("row",a);return;}
+    if(n.equals("c")&&row!=null){cell=element("c",a);stack.clear();stack.push(cell);valued=false;return;}
+    if(cell!=null){Element e=element(n,a);stack.peek().appendChild(e);stack.push(e);if(n.equals("v")||n.equals("is"))valued=true;}
+   }
+   @Override public void characters(char[] c,int start,int length){if(cell!=null&&!stack.isEmpty())stack.peek().appendChild(doc.createTextNode(new String(c,start,length)));}
+   @Override public void endElement(String uri,String local,String q)throws SAXException{
+    String n=local.isEmpty()?q:local;
+    if(n.equals("c")&&cell!=null){if(valued)row.appendChild(cell);cell=null;stack.clear();}
+    else if(n.equals("row")){if(row!=null&&row.hasChildNodes()){if(++rows>50000)throw new SAXException("A worksheet exceeds 50,000 value-bearing rows");root.appendChild(row);}row=null;}
+    else if(cell!=null&&!stack.isEmpty())stack.pop();
+   }
+  });reader.parse(new InputSource(new ByteArrayInputStream(raw)));return doc;
  }
  private static final class Cell {String value="";boolean percent;}
  private static String at(Map<Integer,Cell> row,int col){Cell c=row.get(col);return c==null?"":c.value;}

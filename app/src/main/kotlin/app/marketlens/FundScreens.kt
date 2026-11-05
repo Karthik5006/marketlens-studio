@@ -13,16 +13,18 @@ import org.json.JSONObject
 import java.time.LocalDate
 
 @Composable internal fun FundsScreen(s:LensState,vm:LensViewModel,a:UiActions){
- var section by rememberSaveable{mutableStateOf("Explore")};Label("The companies inside your funds",Violet);Text("See beneath\nthe portfolio.",fontSize=35.sp,lineHeight=39.sp,color=Ink,fontWeight=FontWeight.Bold)
- ChoiceRow(listOf("Explore","Overlap","Changes","Fund facts"),section){section=it}
+ var section by rememberSaveable{mutableStateOf("Most held")};Label("The companies inside your funds",Violet);Text("See beneath\nthe portfolio.",fontSize=35.sp,lineHeight=39.sp,color=Ink,fontWeight=FontWeight.Bold)
+ ChoiceRow(listOf("Most held","Explore","Overlap","Changes","Fund facts"),section){section=it}
  Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Action(if("funds" in s.busy)"Syncing…"else "Sync official AMCs",{vm.syncFunds()},primary=true,enabled="funds" !in s.busy,icon=Icons.Rounded.Sync);Action("Import",{a.importFile("fund")},icon=Icons.Rounded.UploadFile)}
  ErrorLine(s,"funds"){vm.syncFunds()}
  Caption("Auto-sync: PPFAS and supported HDFC monthly equity portfolios. Other AMCs: import their XLSX/CSV disclosures. Reporting dates differ; derivatives and unrecognized rows are excluded.")
  val funds=s.funds.sortedBy{it.name}
  if(funds.isEmpty()){EmptyState("Start with the disclosures","Sync the official AMC pages or import a monthly portfolio. Real holdings will appear here.",Icons.Rounded.Layers);Action("AMFI disclosure directory",{a.url(Repository.AMFI)});return}
  when(section){
+ "Most held"->FundPopularityScreen(s,vm,a)
  "Explore"->{SectionTitle("Covered schemes","${funds.size} snapshots saved")
   funds.forEach{p->var expanded by remember(p.id){mutableStateOf(false)};LensCard(accent=Violet){Label(if(p.imported)"Imported disclosure"else "Official AMC disclosure",Violet);Text(p.name,color=Ink,fontSize=18.sp,fontWeight=FontWeight.SemiBold);MetricPair("Equity rows",p.holdings.size.toString(),"Equity weight recognized",percent(p.holdings.sumOf{it.weight}));Caption("Snapshot ${p.date}");Action("Add my fund value",{a.form(fundValueForm(p,s,vm))},icon=Icons.Rounded.Add);Action(if(expanded)"Hide holdings"else "View top holdings",{expanded=!expanded})
+   val classification=FundPopularity.classification(p,s.records);Caption("${classification.category.label} · ${classification.amc.ifBlank{"AMC unverified"}} · ${if(classification.manual)"Your classification"else "Inferred label"}");Action("Edit scheme classification",{a.form(fundClassificationForm(p,s,vm))})
    if(expanded)p.holdings.sortedByDescending{it.weight}.take(15).forEach{h->AllocationBar(h.stock.ifBlank{h.isin},h.weight,100.0,Violet,number(h.shares,0)+" shares")}
    SourceNote(p.source,p.date,p.fetched,open=a.url);TextButton({vm.removeFund(p.id)}){Text("Remove saved snapshot",color=Muted,fontSize=11.sp)}
   }}
